@@ -11,10 +11,19 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/','ReportsController@index');
+Route::get('/',function(){
+    return redirect('/login');
 });
+
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::group(['middleware' => ['auth']], function () {
+    Route::get('/home','ReportsController@index');
+});
+
+Route::get('/getReports/{type?}','ReportsController@getReports')->name('report.getAll');
+Route::post('/addReport','ReportsController@addReport')->name('report.add');
+Route::post('/report/{action}','ReportsController@actionReport')->name('report.action');
+Route::get('/getUsers','ReportsController@getUsers')->name('user.get');

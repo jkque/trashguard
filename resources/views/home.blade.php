@@ -1,113 +1,72 @@
 @extends('layouts.app')
 @section('content')
-<link rel="stylesheet" type="text/css" href="{{ asset('/css/nav-style.css') }}">
-<div class="container">
-    <div id="wrapper">
-        <div id="sidebar-wrapper">
-            <nav id="spy">
-                <ul class="sidebar-nav nav">
-                    <li class="sidebar-brand">
-                        <img src="{{asset('images/trashguard.png')}}" style="width: 80%; padding: 30px;">
-                    </li>
-                    <li class="li-nav">REPORTS</li>
-                    <li class="li-nav">ON-GOING</li>
-                    <li class="li-nav">SOLVED</li>
-                    <li class="li-nav">DECLINED</li>
-                </ul>
-            </nav>
-        </div>
+    <div>
+        <div class="d-flex" id="wrapper">
 
-        <!-- Page content -->
-        <div id="page-content-wrapper">
-            <div class="tab-pane active" id="report_tab" role="tabpanel" aria-labelledby="nav-home-tab">
-                <div class="row">
-                    <div class="col-md-4" style="background-color: #f1f2f6; padding: 30px; position: fixed; height: 100%; z-index: 100; width: 25%;">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <select class="w-100" style="background: #a0a0a0; font-weight: 500; border: none;">
-                                    <option>Barangay</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <select class="w-100" style="background: #a0a0a0; font-weight: 500; border: none;">
-                                    <option>Sitio</option>
-                                </select>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="col-md-12" style="overflow-y: auto; height: 82%;">
-                            <ul>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                                <li>asdasdasdasd</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-md-8" style="background-color: #fff; position: fixed; height: 100%; padding-left: 26%; width: 100%">
-                        <div class="row">
-                            <div class="col-md-6" style="padding: 20px 0px 0px; padding-bottom: 10px;">
-                                <i class="lnr lnr-checkmark-circle" aria-hidden="true" style="font-size: 20px; font-weight: bold; color: grey; padding: 20px"></i>  
-                                <i class="lnr lnr-cross-circle" aria-hidden="true" style="font-size: 20px; font-weight: bold; color: grey; padding: 20px"></i>   
-                                <i class="lnr lnr-trash" aria-hidden="true" style="font-size: 20px; font-weight: bold; color: grey; padding: 20px"></i>
-                            </div>
-                            <div class="col-md-6" style="padding: 20px 0px 0px;">
-                                <div style="float: right; margin-right: 5%;">
-                                    <input type="text" name="" placeholder="Search...">
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-                    </div>
+            <!-- Sidebar -->
+            <div id="sidebar-wrapper">
+                <div class="sidebar-heading">
+                    <img src="{{ asset('/images/trashguard.png') }}" class="img-responsive" alt="">
                 </div>
-            {{-- <div class="tab-content">
-                <div class="tab-pane active" id="report_tab" role="tabpanel" aria-labelledby="nav-home-tab">
-                    <div class="row">
-                        <div class="col-md-4" style="background-color: #f1f2f6; padding: 30px;">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <select>
-                                        <option>Barangay</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <select>
-                                        <option>Sitio</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <hr>
-                        </div>
-                        <div class="col-md-8" style="background-color: #fff">
-                            activeactiveactiveactiveactiveactiveactiveactiveactiveactiveactiveactiveactiveactiveactiveactiveactiveactiveactiveactive
-                        </div>
-                    </div>
+                <div class="list-group list-group-flush tg-menu">
+                    <a href="/" data-name="Reports" class="list-group-item list-group-item-action bg-light"><i class="ti-folder"></i>&nbsp; Reports</a>
+                    <a href="/p/ongoing" data-name="On-going" class="list-group-item list-group-item-action bg-light"><i class="ti-reload"></i>&nbsp; ON-GOING</a>
+                    <a href="/p/solved" data-name="Solved" class="list-group-item list-group-item-action bg-light"><i class="ti-check"></i>&nbsp; Solved</a>
+                    <a href="/p/declined" data-name="Declined" class="list-group-item list-group-item-action bg-light"><i class="ti-close"></i>&nbsp; Declined</a>
+                    <a href="/p/archive" data-name="Archive" class="list-group-item list-group-item-action bg-light"><i class="ti-trash"></i>&nbsp; Archive</a>
                 </div>
-                <div class="tab-pane fade show" id="ongoing_tab" role="tabpanel" aria-labelledby="nav-home-tab">asdasdasdas</div>
-                <div class="tab-pane fade show" id="solved_tab" role="tabpanel" aria-labelledby="nav-home-tab">asdasdasdasdasdasdddddddddddddddddddddddas</div>
-                <div class="tab-pane fade show" id="declined_tab" role="tabpanel" aria-labelledby="nav-home-tab">asdasdasdasdasdasdddddddddddddddddd123333333333dddddas</div>
-            </div> --}}
+            </div>
+            <!-- /#sidebar-wrapper -->
+
+            <!-- Page Content -->
+            <div id="page-content-wrapper">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+                    <button class="btn btn-primary btn-menu" id="menu-toggle"><i class="ti-menu"></i></button>
+                    <span class="navbar-text hidden navbar-page-name" >
+                        <strong>@{{ current_page }}</strong>
+                    </span>
+
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+                            
+                            <li class="nav-item">
+                                <button type="button" @click="$router.push('/addReport')" class="btn btn-outline-primary navbar-btn"><i class="ti-plus"></i>&nbsp; Add Report</button>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    {{ Auth::user()->name }}
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="#">Action</a>
+                                    <a class="dropdown-item" href="#">Another action</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        {{ __('Logout') }}
+                                    </a>
+                                </div>
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                    @csrf
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                <router-view :key="$route.fullPath"></router-view>
+            </div><!-- /#page-content-wrapper -->
         </div>
-    </div>       
-</div>
+    </div>
+@endsection
+
+
+@section('scripts')
+    <script>
+        $("#menu-toggle").click(function(e) {
+            e.preventDefault();
+            $("#wrapper").toggleClass("toggled");
+        });
+    </script>
 @endsection

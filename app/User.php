@@ -16,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name','first_name','last_name', 'email', 'password', 'type', 'phone_number','token','profile_photo'
     ];
 
     /**
@@ -27,4 +27,14 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+    protected $appends = ['name'];
+
+    public function getNameAttribute()
+    {
+        return ucfirst($this->attributes['first_name']) . ' ' . ucfirst($this->attributes['last_name']);
+    }
+
+    public function notifications(){
+        return $this->hasMany('\App\Notifications');
+    }
 }
