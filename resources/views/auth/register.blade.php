@@ -79,7 +79,7 @@
                                 </button>
                                 <br>
                                 <p class="text-center">
-                                    <a href="/login" >Sign In</a>
+                                    <a href="{{ url('/login') }}" >Sign In</a>
                                 </p>
                             </div>
                         </div>

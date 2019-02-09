@@ -65,7 +65,7 @@
                                     </p>
                                 @endif
                                 <p class="text-center">
-                                    <a href="/register" >Not yet member?</a>
+                                    <a href="{{ url('/register') }}" >Not yet member?</a>
                                 </p>
                             </div>
                         </div>
