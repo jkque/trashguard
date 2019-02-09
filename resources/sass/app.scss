@@ -11,6 +11,7 @@
 @import "node_modules/toastr/toastr.scss";
 
 @-webkit-keyframes MovingBackgroundGradient{0%,100%{background-position:0 50%}50%{background-position:100% 51%}}@-moz-keyframes MovingBackgroundGradient{0%,100%{background-position:0 50%}50%{background-position:100% 51%}}@-o-keyframes MovingBackgroundGradient{0%,100%{background-position:0 50%}50%{background-position:100% 51%}}@keyframes MovingBackgroundGradient{0%,100%{background-position:0 50%}50%{background-position:100% 51%}}
+@-webkit-keyframes loginBackground {0%,100%{background-position:0 50%}50%{background-position:100% 50%}}@-moz-keyframes loginBackground{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}@-o-keyframes loginBackground{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}@keyframes loginBackground{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
 
 .content-load{
   opacity: 0.5;
@@ -149,5 +150,17 @@ body {
   }
   .invalid-feedback {
     display: block;
+  }
+}
+#login-view {
+  background: linear-gradient(270deg, #f8d13a, #f88f3a, #f8d13a, #ffe16c);
+  background-size: 600% 600%;
+
+  -webkit-animation: loginBackground 30s ease infinite;
+  -moz-animation: loginBackground 30s ease infinite;
+  -o-animation: loginBackground 30s ease infinite;
+  animation: loginBackground 30s ease infinite;
+  & > div{
+    height: 100vh;
   }
 }
