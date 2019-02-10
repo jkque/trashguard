@@ -128,7 +128,7 @@ class ReportsController extends Controller
         ];
     }
 
-    public function mLogin(){
+    public function mLogin(Request $request){
         $validator = Validator::make($request->all(), [
             'user_email'  => 'required',
             'token'      => 'required',
