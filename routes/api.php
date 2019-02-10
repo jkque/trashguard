@@ -16,3 +16,9 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// API for mobile
+// Route::apiResource('/api/','ReoirtsController');
+Route::post('/register','ReportsController@mRegister');
+Route::post('/login','ReportsController@mLogin');
+Route::post('/report/send','ReportsController@mReportSend');

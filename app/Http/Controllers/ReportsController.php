@@ -144,7 +144,7 @@ class ReportsController extends Controller
             $user->save();
             return [
                 'error' => false,
-                'message' => 'Sucessfully logged in'
+                'message' => 'Sucessfully logged in',
                 'id'    => $user->id,
                 'email' => $user->email,
                 'fname' => $user->first_name,
