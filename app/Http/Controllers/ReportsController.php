@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Report;
 use Validator;
+use Illuminate\Support\Facades\Hash;
 use App\User;
 use Auth;
 
@@ -138,19 +139,21 @@ class ReportsController extends Controller
         if ($validator->fails()) {
             return ['error' => true,'message'=>'Required fields are missing','stack_trace' => $validator->errors()];
         }   
-        $user = User::where("email",$request->user_email)->where("password",Hash::make($request->password))->first();
+        $user = User::where("email",$request->user_email)->first();
         if($user){
-            $user->token = $request->token;
-            $user->save();
-            return [
-                'error' => false,
-                'message' => 'Sucessfully logged in',
-                'id'    => $user->id,
-                'email' => $user->email,
-                'fname' => $user->first_name,
-                'lname' => $user->last_name,
-                'token' => $user->token,
-            ];
+            if(Hash::check($request->password, $user->password)){
+                $user->token = $request->token;
+                $user->save();
+                return [
+                    'error' => false,
+                    'message' => 'Sucessfully logged in',
+                    'id'    => $user->id,
+                    'email' => $user->email,
+                    'fname' => $user->first_name,
+                    'lname' => $user->last_name,
+                    'token' => $user->token,
+                ];
+            }
         }
         return ['error'=>true,'message'=>'Invalid email or password'];
     }
