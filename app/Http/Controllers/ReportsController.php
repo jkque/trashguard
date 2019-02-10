@@ -90,4 +90,66 @@ class ReportsController extends Controller
         } 
         return ['success' => false];
     }
+
+
+
+
+    // MOBILE API
+
+    public function mRegister(Request $request){
+        $validator = Validator::make($request->all(), [
+            'user_email'  => 'required',
+            'token'      => 'required',
+            'password'      => 'required',
+            'phone_num'      => 'required',
+            'fname'      => 'required',
+            'lname'      => 'required',
+        ]);
+        if ($validator->fails()) {
+            return ['error' => true,'message'=>'Required fields are missing','stack_trace' => $validator->errors()];
+        }
+        $newUser = new User;
+        $newUser->first_name = $request->fname;
+        $newUser->last_name  = $request->lname;
+        $newUser->token      = $request->token;
+        $newUser->name       = $request->fname . " " . $request->lname;
+        $newUser->email      = $request->user_email;
+        $newUser->password   = Hash::make($request->password);
+        $newUser->type       = 0;
+        $newUser->save();
+
+        return [
+            'error' => false,
+            'message' => 'User registered sucessfully',
+            'id'    => $newUser->id,
+            'email' => $newUser->email,
+            'fname' => $newUser->first_name,
+            'lname' => $newUser->last_name,
+        ];
+    }
+
+    public function mLogin(){
+        $validator = Validator::make($request->all(), [
+            'user_email'  => 'required',
+            'token'      => 'required',
+            'password'      => 'required',
+        ]);
+        if ($validator->fails()) {
+            return ['error' => true,'message'=>'Required fields are missing','stack_trace' => $validator->errors()];
+        }   
+        $user = User::where("email",$request->email)->where("password",Hash::make($request->password))->first();
+        if($user){
+            $user->token = $request->token;
+            $user->save();
+            return [
+                'error' => false,
+                'id'    => $user->id,
+                'email' => $user->email,
+                'fname' => $user->first_name,
+                'lname' => $user->last_name,
+                'token' => $user->token,
+            ];
+        }
+        return ['error'=>true,'message'=>'Invalid email or password'];
+    }
 }

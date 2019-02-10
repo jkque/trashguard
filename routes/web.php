@@ -27,3 +27,7 @@ Route::get('/getReports/{type?}','ReportsController@getReports')->name('report.g
 Route::post('/addReport','ReportsController@addReport')->name('report.add');
 Route::post('/report/{action}','ReportsController@actionReport')->name('report.action');
 Route::get('/getUsers','ReportsController@getUsers')->name('user.get');
+
+// API for mobile
+Route::post('/m/api/register','ReportsController@mRegister');
+Route::post('/m/api/login','ReportsController@mLogin');
