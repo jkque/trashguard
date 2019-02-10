@@ -112,6 +112,7 @@ class ReportsController extends Controller
         $newUser->first_name = $request->fname;
         $newUser->last_name  = $request->lname;
         $newUser->token      = $request->token;
+        $newUser->phone_number = $request->phone_num;
         $newUser->name       = $request->fname . " " . $request->lname;
         $newUser->email      = $request->user_email;
         $newUser->password   = Hash::make($request->password);
@@ -137,12 +138,13 @@ class ReportsController extends Controller
         if ($validator->fails()) {
             return ['error' => true,'message'=>'Required fields are missing','stack_trace' => $validator->errors()];
         }   
-        $user = User::where("email",$request->email)->where("password",Hash::make($request->password))->first();
+        $user = User::where("email",$request->user_email)->where("password",Hash::make($request->password))->first();
         if($user){
             $user->token = $request->token;
             $user->save();
             return [
                 'error' => false,
+                'message' => 'Sucessfully logged in'
                 'id'    => $user->id,
                 'email' => $user->email,
                 'fname' => $user->first_name,
@@ -151,5 +153,32 @@ class ReportsController extends Controller
             ];
         }
         return ['error'=>true,'message'=>'Invalid email or password'];
+    }
+
+    public function mReportSend(){
+        $validator = Validator::make($request->all(), [
+            'user_id'  => 'required',
+            'report_date'      => 'required',
+            'report_time'      => 'required',
+            'report_details'   => 'required',
+            'report_location'   => 'required',
+        ]);
+        if ($validator->fails()) {
+            return ['error' => true,'message'=>'Required fields are missing','stack_trace' => $validator->errors()];
+        }   
+        
+        $newReport = new Report;
+        $newReport->user_id = $request->user_id;
+        $newReport->desc = $request->report_details;
+        $newReport->location = $request->report_location;
+        $newReport->type = 0;
+        $newReport->save();
+
+        return [
+            'error' => false,
+            'message' => 'Succesfully sent a report',
+            'report' => $newReport,
+        ];
+
     }
 }

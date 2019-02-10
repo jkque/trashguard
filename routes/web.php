@@ -31,3 +31,4 @@ Route::get('/getUsers','ReportsController@getUsers')->name('user.get');
 // API for mobile
 Route::post('/m/api/register','ReportsController@mRegister');
 Route::post('/m/api/login','ReportsController@mLogin');
+Route::post('/m/api/report/send','ReportsController@mReportSend');
