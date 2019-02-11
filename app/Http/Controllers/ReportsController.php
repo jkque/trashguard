@@ -166,6 +166,8 @@ class ReportsController extends Controller
             'report_time'      => 'required',
             'report_details'   => 'required',
             'report_location'  => 'required',
+            'report_date'      => 'required',
+            'report_time'      => 'required',
         ]);
         if ($validator->fails()) {
             return ['error' => true,'message'=>'Required fields are missing','stack_trace' => $validator->errors()];
@@ -175,6 +177,7 @@ class ReportsController extends Controller
         $newReport->user_id = $request->user_id;
         $newReport->desc = $request->report_details;
         $newReport->location = $request->report_location;
+        $newReport->witnessed_at = date('Y-m-d H:i:s',$request->report_date." ".$request->report_time);
         $newReport->type = 0;
         $newReport->save();
         
@@ -182,7 +185,7 @@ class ReportsController extends Controller
             $reportImage = new ReportImage;
             $reportImage->report_id = $newReport->id;
             $reportImage->image_name = $this->base64_to_jpeg($value,"uploads/"."w-".$newReport->id."-".uniqid().".jpg");
-            $reoirtImage->save();
+            $reportImage->save();
         }
         
         return [
