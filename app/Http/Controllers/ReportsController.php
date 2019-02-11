@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Report;
+use App\ReportImage;
 use Validator;
 use Illuminate\Support\Facades\Hash;
 use App\User;
