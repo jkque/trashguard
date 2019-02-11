@@ -160,11 +160,12 @@ class ReportsController extends Controller
 
     public function mReportSend(){
         $validator = Validator::make($request->all(), [
+            'image'    => 'required',
             'user_id'  => 'required',
             'report_date'      => 'required',
             'report_time'      => 'required',
             'report_details'   => 'required',
-            'report_location'   => 'required',
+            'report_location'  => 'required',
         ]);
         if ($validator->fails()) {
             return ['error' => true,'message'=>'Required fields are missing','stack_trace' => $validator->errors()];
@@ -176,7 +177,14 @@ class ReportsController extends Controller
         $newReport->location = $request->report_location;
         $newReport->type = 0;
         $newReport->save();
-
+        
+        foreach($request->image as $key => $value){
+            $reportImage = new ReportImage;
+            $reportImage->report_id = $newReport->id;
+            $reportImage->image_name = $this->base64_to_jpeg($value,"uploads/"."w-".$newReport->id."-".uniqid().".jpg");
+            $reoirtImage->save();
+        }
+        
         return [
             'error' => false,
             'message' => 'Succesfully sent a report',
