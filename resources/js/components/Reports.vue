@@ -62,7 +62,9 @@
                                     <button type="button" @click="actionButton('approve')" class="btn btn-light"><i class="ti-check"></i>&nbsp; Approve</button>
                                     <button type="button" @click="actionButton('decline')" class="btn btn-light"><i class="ti-close"></i>&nbsp; Decline</button>
                                 </div>
-                                <div class="col-6" v-if="current_type == 'ongoing'"></div>
+                                <div class="col-6" v-if="current_type == 'ongoing'">
+                                    <button type="button" @click="actionButton('solve')" class="btn btn-light"><i class="ti-thumb-up"></i>&nbsp; Mark as solved</button>
+                                </div>
                                 <div class="col-6" v-if="my_type == 1 || my_type == 3">
                                     <button type="button" @click="actionButton('delete')" class="btn btn-outline-danger"><i class="ti-trash"></i>&nbsp; Delete</button>
                                 </div>

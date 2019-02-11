@@ -177,7 +177,7 @@ class ReportsController extends Controller
         $newReport->user_id = $request->user_id;
         $newReport->desc = $request->report_details;
         $newReport->location = $request->report_location;
-        $newReport->witnessed_at = date('Y-m-d H:i:s',$request->report_date." ".$request->report_time);
+        $newReport->witnessed_at = date('Y-m-d H:i:s',strtotime($request->report_date." ".$request->report_time));
         $newReport->type = 0;
         $newReport->save();
         
