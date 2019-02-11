@@ -48,7 +48,15 @@ body {
 
 #sidebar-wrapper {
   min-height: 100vh;
-  background-color: #f8d13a !important;
+
+  background: linear-gradient(48deg, #f8d13a, #fbcb12, #f9ce27, #ffe16c);
+  background-size: 600% 600%;
+
+  -webkit-animation: loginBackground 30s ease infinite;
+  -moz-animation: loginBackground 30s ease infinite;
+  -o-animation: loginBackground 30s ease infinite;
+  animation: loginBackground 30s ease infinite;
+
   margin-left: -15rem;
   -webkit-transition: margin .25s ease-out;
   -moz-transition: margin .25s ease-out;

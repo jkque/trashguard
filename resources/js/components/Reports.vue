@@ -82,6 +82,7 @@
                                 </div>
                                 <div class="col-11">
                                     <h2>{{ selected_report.location }}</h2>
+                                    <p v-if="selected_report.witnessed_at" style="color: #7f8c8d">Witnessed at {{ selected_report.witnessed_at | standard_date }}</p>
                                 </div>
                             </div>
                             <div class="report-description">
