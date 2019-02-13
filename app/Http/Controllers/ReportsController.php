@@ -7,6 +7,7 @@ use App\Report;
 use Validator;
 use Illuminate\Support\Facades\Hash;
 use App\User;
+use App\ReportImage;
 use Auth;
 
 class ReportsController extends Controller
@@ -61,7 +62,6 @@ class ReportsController extends Controller
         $file = fopen($output_file, "w+");
  
         $data = explode(',', $base64_string);
- 
         fwrite($file, base64_decode($data[1]));
         fclose($file);
  
@@ -158,7 +158,7 @@ class ReportsController extends Controller
         return ['error'=>true,'message'=>'Invalid email or password'];
     }
 
-    public function mReportSend(){
+    public function mReportSend(Request $request){
         $validator = Validator::make($request->all(), [
             'image'    => 'required',
             'user_id'  => 'required',
@@ -166,8 +166,8 @@ class ReportsController extends Controller
             'report_time'      => 'required',
             'report_details'   => 'required',
             'report_location'  => 'required',
-            'report_date'      => 'required',
-            'report_time'      => 'required',
+            // 'report_date'      => 'required',
+            // 'report_time'      => 'required',
         ]);
         if ($validator->fails()) {
             return ['error' => true,'message'=>'Required fields are missing','stack_trace' => $validator->errors()];
@@ -184,7 +184,7 @@ class ReportsController extends Controller
         foreach($request->image as $key => $value){
             $reportImage = new ReportImage;
             $reportImage->report_id = $newReport->id;
-            $reportImage->image_name = $this->base64_to_jpeg($value,"uploads/"."w-".$newReport->id."-".uniqid().".jpg");
+            $reportImage->image_name = $this->base64_to_jpeg($value,"uploads/reports/"."w-".$newReport->id."-".uniqid().".jpg");
             $reportImage->save();
         }
         
@@ -194,5 +194,88 @@ class ReportsController extends Controller
             'report' => $newReport,
         ];
 
+    }
+
+    public function mUploadProfilePicture(Request $request){
+        $validator = Validator::make($request->all(), [
+            'image'    => 'required',
+            'user_id'  => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return ['error' => true,'message'=>'Required fields are missing','stack_trace' => $validator->errors()];
+        }
+        
+        $user = User::find($request->user_id);
+
+        if($user){
+            $user->profile_photo = $this->base64_to_jpeg($request->image,"uploads/profile/"."w-".$request->user_id."-".uniqid().".jpg");
+            $user->save();
+            return [
+                'error' => false,
+                'message' => 'Sucessfully uploaded profile picture',
+                'profile_photo' => $user,
+            ];
+        }
+        return ['error'=>true,'message'=>'Invalid email or password'];
+    }
+
+    public function mGetReports(Request $request){
+        $validator = Validator::make($request->all(), [
+            'user_id'  => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return ['error' => true,'message'=>'Required fields are missing','stack_trace' => $validator->errors()];
+        }
+
+        $reports = Report::where("user_id",$request->user_id)->get()->toArray();
+    
+        $temp = array();
+
+        foreach($reports as $key => $value){
+            $temp = array();
+            $reports[$key]['images'] = array();
+            $reportImage = ReportImage::where("report_id", $reports[$key]['id'])->get()->toArray();
+
+            // array_push($temp,$reportImage);    
+            array_push($reports[$key]['images'],$reportImage); 
+        }
+        
+        return $reports;    
+    }
+
+    public function mGetReportsCount(Request $request){
+        $validator = Validator::make($request->all(), [
+            'user_id'  => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return ['error' => true,'message'=>'Required fields are missing','stack_trace' => $validator->errors()];
+        }
+
+        $reportsCount = Report::where("user_id",$request->user_id)->count();
+        $pendingCount = Report::where("user_id",$request->user_id)
+            ->where("type",0)
+            ->count();
+        $solvedCount = Report::where("user_id",$request->user_id)
+            ->where("type",1)
+            ->count();
+        $ongoingCount = Report::where("user_id",$request->user_id)
+            ->where("type",2)
+            ->count();
+        $declinedCount = Report::where("user_id",$request->user_id)
+            ->where("type",03)
+            ->count();
+        
+        return [
+            'error'   => false,
+            'message' => 'Success',
+            'total'   => $reportsCount,
+            'pending' => $pendingCount,
+            'solved'  => $solvedCount,
+            'ongoing' => $ongoingCount,
+            'declined'=> $declinedCount,
+        ];    
     }
 }

@@ -21,6 +21,9 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         '/m/api/register',
         '/m/api/login',
-        '/m/api/report/send'
+        '/m/api/report/send',
+        '/m/api/user/upload',
+        '/m/api/report/getReports',
+        '/m/api/report/getReportsCount'
     ];
 }
