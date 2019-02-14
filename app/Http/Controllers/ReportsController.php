@@ -8,7 +8,6 @@ use App\ReportImage;
 use Validator;
 use Illuminate\Support\Facades\Hash;
 use App\User;
-use App\ReportImage;
 use Auth;
 
 class ReportsController extends Controller
@@ -27,7 +26,7 @@ class ReportsController extends Controller
         if(!empty(isset($request->search))){
             $reports->whereRaw("(reports.location LIKE '%".$request->search."%' OR reports.desc LIKE '%".$request->search."%')");
         }
-        return $reports->orderBy('created_at',"desc")->paginate(10);
+        return $reports->with("images")->orderBy('created_at',"desc")->paginate(10);
     }
 
     public function getUsers(Request $request){
@@ -39,6 +38,7 @@ class ReportsController extends Controller
             'location'  => 'required',
             'desc'      => 'required',
             'user_id'      => 'required',
+            'witnessed_at'  => 'required',
         ]);
         if ($validator->fails()) {
             return ['success' => false,'errors' => $validator->errors()];
@@ -48,8 +48,27 @@ class ReportsController extends Controller
         $newReport->location    = $request->location;
         $newReport->desc        = $request->desc;
         $newReport->user_id     = $request->user_id;
+        $newReport->witnessed_at = date('Y-m-d H:i:s',strtotime($request->witnessed_at));        
         $newReport->type        = 0;
         $newReport->save();
+        if($request->images){
+            if($request->hasFile('images')) {
+                $files = $request->file('images');
+                if(is_array($files)){
+                    foreach($files as $fileKey => $file){
+                        $extension = $file->getClientOriginalExtension();
+                        $newFilename = "w-".$newReport->id."-".uniqid().".". $extension;
+                        $destinationPath = public_path('/uploads/reports');
+                        $file->move($destinationPath, $newFilename);
+
+                        $reportImage = new ReportImage;
+                        $reportImage->report_id = $newReport->id;
+                        $reportImage->image_name = "uploads/reports/".$newFilename;
+                        $reportImage->save();
+                    }
+                }
+            }
+        }
         
         // $decoded = base64_decode($request->image);
         // $filename_path = "w-".$newReport->id."-".uniqid().".jpg";
@@ -230,18 +249,26 @@ class ReportsController extends Controller
             return ['error' => true,'message'=>'Required fields are missing','stack_trace' => $validator->errors()];
         }
 
-        $reports = Report::where("user_id",$request->user_id)->get()->toArray();
-    
-        $temp = array();
-
-        foreach($reports as $key => $value){
-            $temp = array();
-            $reports[$key]['images'] = array();
-            $reportImage = ReportImage::where("report_id", $reports[$key]['id'])->get()->toArray();
-
-            // array_push($temp,$reportImage);    
-            array_push($reports[$key]['images'],$reportImage); 
+        $reports = Report::where("user_id",$request->user_id)->with("images")->get();
+        
+        foreach($reports as $reportKey => $report) {
+            foreach($report->images as $imageKey => $image){
+                if($image){
+                    $reports[$reportKey]->images[$imageKey]->image_name = url($image->image_name);
+                }
+            }
         }
+
+        // $temp = array();
+
+        // foreach($reports as $key => $value){
+        //     $temp = array();
+        //     $reports[$key]['images'] = array();
+        //     $reportImage = ReportImage::where("report_id", $reports[$key]['id'])->get()->toArray();
+
+        //     // array_push($temp,$reportImage);    
+        //     array_push($reports[$key]['images'],$reportImage); 
+        // }
         
         return $reports;    
     }

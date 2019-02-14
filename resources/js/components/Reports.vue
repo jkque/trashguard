@@ -26,19 +26,19 @@
                 <div class="report-list-scrollable" v-else>
                     <ul class="nav flex-column nav-pills report-list" id="pills-tab" role="tablist">
                         <li class="nav-item report-item">
-                            <div class="nav-link" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-selected="true">
+                            <div class="nav-link"  data-toggle="pill" href="#pills-home" role="tab" aria-selected="true">
                                 <div class="content-load" style="height: 21px; width: 100%"></div>
                                 <div class="content-load" style="height: 21px; width: 70%"></div>
                             </div>
                         </li>
                         <li class="nav-item report-item">
-                            <div class="nav-link" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-selected="true">
+                            <div class="nav-link"  data-toggle="pill" href="#pills-home" role="tab" aria-selected="true">
                                 <div class="content-load" style="height: 21px; width: 100%"></div>
                                 <div class="content-load" style="height: 21px; width: 70%"></div>
                             </div>
                         </li>
                         <li class="nav-item report-item">
-                            <div class="nav-link" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-selected="true">
+                            <div class="nav-link"  data-toggle="pill" href="#pills-home" role="tab" aria-selected="true">
                                 <div class="content-load" style="height: 21px; width: 100%"></div>
                                 <div class="content-load" style="height: 21px; width: 70%"></div>
                             </div>
@@ -63,10 +63,15 @@
                                     <button type="button" @click="actionButton('decline')" class="btn btn-light"><i class="ti-close"></i>&nbsp; Decline</button>
                                 </div>
                                 <div class="col-6" v-if="current_type == 'ongoing'">
-                                    <button type="button" @click="actionButton('solve')" class="btn btn-light"><i class="ti-thumb-up"></i>&nbsp; Mark as solved</button>
+                                    <button type="button" @click="actionButton('solve')" class="btn btn-outline-success"><i class="ti-thumb-up"></i>&nbsp; Mark as solved</button>
                                 </div>
                                 <div class="col-6" v-if="my_type == 1 || my_type == 3">
                                     <button type="button" @click="actionButton('delete')" class="btn btn-outline-danger"><i class="ti-trash"></i>&nbsp; Delete</button>
+                                </div>
+                                <div class="col-6" v-if="my_type == 4">
+                                    <div class="alert alert-success" role="alert">
+                                        Deleted
+                                    </div>
                                 </div>
                                 <div class="col-6">
                                     <div class="clearfix">
@@ -94,6 +99,11 @@
                             <div class="report-description">
                                 <label><strong>Attachment</strong></label>
                                 <!-- <img src="" alt="" class="img-responsive"> -->
+                                <div class="card-deck no-margin" >
+		                            <div class="card my-3" @click="showImage(image.image_name)" v-for="(image,index) in selected_report.images" :key="index" style="cursor:pointer;align-items:center; justify-content: center;">
+                                        <img style="display: block;" :src="image.image_name | url"  class="img-fluid img-thumbnail" alt="Responsive image">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -138,6 +148,15 @@
                 <!-- preloader -->
             </div>
         </div>
+        <div class="modal fade" id="show-image" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <img v-if="image_path" style="margin: 0 auto; display: block;" :src="image_path | url" alt="" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -154,7 +173,8 @@
                 search:         "",
                 current_type:   "reports",
                 my_type:           0,
-                empty:          false
+                empty:          false,
+                image_path:     null,
             }
         },
         mounted(){
@@ -197,6 +217,10 @@
             },
             selectReport(report){
                 this.selected_report = report;
+            },
+            showImage(path){
+                this.image_path = path;
+                $('#show-image').modal("show");
             },
             actionButton(action){
                 let self = this;
@@ -288,7 +312,7 @@
                         display: block;
                         float: left;
                         font-weight: 600;
-                        width: 58%;
+                        width: 54%;
                     }
                     .report-time {
                         display: block;

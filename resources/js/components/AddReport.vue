@@ -1,43 +1,52 @@
 <template>
     <div>
-        <div class="flex-parent justify-content-center" style="margin-top: 15px">
-            <div class="col-4 ">
-                <h3 class="text-center">Manual Report</h3>
-                <p  class="text-center">Add an entry report manually.</p>
-                <div class="card">
-                    <div class="card-body">
-                        <form @submit="addReport($event)" id="addReportForm">
-                            <div class="form-group">
-                                <label >Location</label>
-                                <input type="text" name="location" placeholder="Enter a place.." class="form-control" value="Lorem ipsum dolor sit amet, consectetur adipiscing elit">
-                                <div class="invalid-feedback">
-                                    Please enter location
+        <div style="height: calc(100vh - 56px); padding-bottom: 15%; overflow: auto;">
+            <div class="flex-parent justify-content-center" style="margin-top: 25px;">
+                <div class="col-6 ">
+                    <h3 class="text-center">Manual Report</h3>
+                    <p  class="text-center">Add an entry report manually.</p>
+                    <div class="card">
+                        <div class="card-body">
+                            <form @submit="addReport($event)" id="addReportForm">
+                                <div class="form-group">
+                                    <label >Location</label>
+                                    <input type="text" name="location" placeholder="Enter a place.." class="form-control" >
+                                    <div class="invalid-feedback">
+                                        Please enter location
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Description</label>
-                                <textarea name="desc" placeholder="What have you seen.." class="form-control" rows="3">Etiam tempus egestas posuere. In quis nisi sit amet metus commodo bibendum. Quisque in malesuada dolor, ut convallis neque. Ut sodales, dolor tincidunt commodo hendrerit, massa eros imperdiet turpis, non consectetur arcu enim condimentum augue. Integer ut auctor nulla, non egestas ante. Phasellus ac elementum quam. Suspendisse potenti. Nulla eros dolor, rutrum a neque porta, hendrerit tempor urna. Vivamus augue odio, mollis ac augue eget, ultricies consequat felis. Nam rhoncus ex id sapien aliquam, aliquam ornare velit faucibus.</textarea>
-                                <div class="invalid-feedback">
-                                    Please enter description
+                                <div class="form-group">
+                                    <label>Description</label>
+                                    <textarea name="desc" placeholder="Please describe it.." class="form-control" rows="3"></textarea>
+                                    <div class="invalid-feedback">
+                                        Please enter description
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Image</label>
-                                <input type="file" value="Image" class="form-control" accept="image/*" >
-                                <div class="invalid-feedback">
-                                    Please enter image
+                                <div class="form-group">
+                                    <label>Image</label>
+                                    <div class="custom-file">
+                                        <input type="file" name="images[]" @change="selectedFiles($event)" class="custom-file-input" accept="image/*" multiple>
+                                        <label class="custom-file-label" for="customFile">{{ (files_selected > 0) ? files_selected+((files_selected > 1)?" files":" file")+" selected":"Choose file" }}</label>
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Please enter image
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="user">Reporter</label>
-                                <select name="user_id" class="form-control" id="user">
-                                    <option :value="user.id" v-for="(user,index) in users" :key="index">
-                                        {{ user.name }}
-                                    </option>
-                                </select>
-                            </div>
-                            <button type="submit" class="btn btn-primary btn-add-report">Add Report</button>
-                        </form>
+                                <div class="form-group">
+                                    <label for="user">Reporter</label>
+                                    <select name="user_id" class="form-control" id="user">
+                                        <option :value="user.id" v-for="(user,index) in users" :key="index">
+                                            {{ user.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="user">Date witnessed</label>
+                                    <date-picker name="witnessed_at" v-model="date"></date-picker>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-add-report">Add Report</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -46,11 +55,22 @@
 </template>
 
 <script>
+    import datePicker from 'vue-bootstrap-datetimepicker';
+    import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css';
     export default {
+        components: {
+            datePicker,
+        },
         data(){
             return {
                 users:  [],
                 paginate:   null,
+                date: new Date(),
+                options: {
+                format: 'DD/MM/YYYY',
+                    useCurrent: false,
+                },
+                files_selected: 0,
             }
         },
         created(){
@@ -66,6 +86,7 @@
                 .then((response)=>{
                     if(response.data.success){
                         $("#addReportForm")[0].reset();
+                        this.date = new Date();
                         toastr.success('A new entry has been added','Success!');
                     } else {
                         self.validateForm(response.data.errors);
@@ -75,6 +96,10 @@
                 }).catch((error)=>{
 
                 });
+            },
+            selectedFiles(event){
+                var files = $(event.target)[0].files;
+                this.files_selected = files.length;
             },
             validateForm(errors){
                 $(".form-control").removeClass("invalid");

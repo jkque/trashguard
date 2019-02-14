@@ -1,6 +1,7 @@
 
 // Fonts
 @import url('https://fonts.googleapis.com/css?family=Nunito');
+// @import "node_modules/bootstrap-datepicker/dist/css/bootstrap-datepicker.css";
 
 // Variables
 @import 'variables';
@@ -171,4 +172,40 @@ body {
   & > div{
     height: 100vh;
   }
+}
+
+@media (min-width: 576px){
+  .card-deck.no-margin {
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+}
+// Bootstrap 4 breakpoints
+$grid-breakpoints: (
+    xs: 0,
+    sm: 576px,
+    md: 768px,
+    lg: 992px,
+    xl: 1200px
+) !default;
+
+// number of cards per line for each breakpoint
+$cards-per-line: (
+    xs: 1,
+    sm: 2,
+    md: 3,
+    lg: 3,
+    xl: 3
+);
+
+.card-deck {
+  display: grid;
+ }
+
+@each $name, $breakpoint in $grid-breakpoints {
+	@media (min-width: $breakpoint) {
+		.card-deck {
+			grid-template-columns: repeat(map-get($cards-per-line, $name), 1fr);
+		}
+	}
 }

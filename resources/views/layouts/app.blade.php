@@ -20,6 +20,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('/assets/themify-icons/themify-icons.css') }}">
     <!-- Bootstrap CSS -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet" />
+
     <!-- Bootstrap JS -->
     <style type="text/css">
     /*Scroll*/

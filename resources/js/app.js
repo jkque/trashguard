@@ -45,6 +45,9 @@ Vue.filter('standard_date',(value) => {
     return moment(value).format('D MMM, YYYY h:mm A');
 });
 
+Vue.filter('url',(value) => {
+    return __root_url+"/"+value;
+});
 const app = new Vue({
     router,
     el: '#app',
