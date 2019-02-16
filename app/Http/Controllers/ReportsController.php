@@ -94,22 +94,69 @@ class ReportsController extends Controller
             if($action == "delete"){
                 $report->type = 4;
                 $report->save();
+                // $this->mSendNotification();
             } else if ($action == "approve" ){
                 $report->type = 2;
                 $report->save();
+                // $this->mSendNotification();
             } else if ($action == "decline"){
                 $report->type = 3; 
                 $report->save();
+                // $this->mSendNotification();
             } else if ($action == "solve"){
                 $report->type = 1; 
                 $report->save();
+                // $this->mSendNotification();
             } else {
                 return ['success' => false];
             }
             $report->updated_by = Auth::user()->id;
+            $this->mSendNotification();
             return ['success'=>true,'action'=>$action];
+            
         } 
         return ['success' => false];
+    }
+
+    public function mSendNotification(){
+        define( 'API_ACCESS_KEY', 'AAAAj0E56bU:APA91bEpHMHjUgoPcCSVXZpxkBuldgFdwVr1DkfbaG-t5RjoOglwEk3SQVzOolXtLQUSD_whVCX6PIJaF9Ra7xS6EeMXISY07ALEfKIeEeNm58lm2BT5A8un5CbZh6fWUyY-SI29KS8u');
+        
+        $to = 'cQm_SgTMF7s:APA91bG5hSmbjY1hXD3Ua1MYizn3CURwPNHzVeA9tvcTeKS_yL_xYPh5G66tQVStvqKDM6jWuaK0ehTlJ_mOKR7EsVOulKsEMHNOeHFyopeXA1sp3OuR6YjT-t5yXYA9WLQxKRHUz9tA';
+        // $data = array(
+        //     "report_id"=> $report->id,
+        //     "user_id" => $report->user_id
+        // );
+
+        $msg = array(
+            // 'body' => $report->desc,
+            'body' => 'asdlkaj',
+            'title' => 'TrashGuard'
+        );
+
+		#prep the bundle
+		$fields = array(
+	    				'to'		=> $to,
+						'notification'	=> $msg
+						// 'data' => $data
+					);
+			
+		$headers = array(
+						'Authorization: key=' . API_ACCESS_KEY,
+						'Content-Type: application/json'
+					);
+		#Send Reponse To FireBase Server	
+		$ch = curl_init();
+		curl_setopt( $ch,CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send' );
+		curl_setopt( $ch,CURLOPT_POST, true );
+		curl_setopt( $ch,CURLOPT_HTTPHEADER, $headers );
+		curl_setopt( $ch,CURLOPT_RETURNTRANSFER, true );
+		curl_setopt( $ch,CURLOPT_SSL_VERIFYPEER, false );
+		curl_setopt( $ch,CURLOPT_POSTFIELDS, json_encode( $fields ) );
+		$result = curl_exec($ch );
+		echo $result;
+		curl_close( $ch );
+
+		// return json_encode ($result,true,JSON_PRETTY_PRINT);
     }
 
 
@@ -150,6 +197,31 @@ class ReportsController extends Controller
         ];
     }
 
+    public function mLogout(Request $request){
+        $validator = Validator::make($request->all(),[
+            'user_id' => 'required',
+        ]);
+
+        if($validator->fails()){
+            return ['error' => true,'message'=>'Required fields are missing','stack_trace' => $validator->errors()];
+        }
+
+        $user = User::where("id",$request->user_id)->first();
+        $user->token = null;
+        $user->save();
+
+        return [
+            'error' => false,
+            'message' => 'Sucessfully logged out',
+            'id'    => $user->id,
+            'email' => $user->email,
+            'fname' => $user->first_name,
+            'lname' => $user->last_name,
+            'token' => $user->token,    
+        ];
+        
+    }
+
     public function mLogin(Request $request){
         $validator = Validator::make($request->all(), [
             'user_email'  => 'required',
@@ -171,7 +243,7 @@ class ReportsController extends Controller
                     'email' => $user->email,
                     'fname' => $user->first_name,
                     'lname' => $user->last_name,
-                    'token' => $user->token,
+                    'token' => $user->token,    
                 ];
             }
         }
@@ -250,7 +322,7 @@ class ReportsController extends Controller
         }
 
         $reports = Report::where("user_id",$request->user_id)->with("images")->get();
-        
+                   
         foreach($reports as $reportKey => $report) {
             foreach($report->images as $imageKey => $image){
                 if($image){
@@ -306,4 +378,20 @@ class ReportsController extends Controller
             'declined'=> $declinedCount,
         ];    
     }
+
+    public function mGetProfilePicture(Request $request){
+        $validator = Validator::make($request->all(),[
+            'user_id'  => 'required',
+        ]);
+
+        if($validator->fails()){
+            return ['error' => true,'message'=>'Required fields are missing','stack_trace' => $validator->errors()];
+        }
+
+        $profilePicture = User::find($request->user_id);
+        $profilePicture->profile_photo = url($profilePicture->profile_photo);
+        return $profilePicture;
+    }
+
+    
 }

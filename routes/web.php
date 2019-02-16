@@ -33,5 +33,8 @@ Route::post('/m/api/register','ReportsController@mRegister');
 Route::post('/m/api/login','ReportsController@mLogin');
 Route::post('/m/api/report/send','ReportsController@mReportSend');
 Route::post('/m/api/user/upload','ReportsController@mUploadProfilePicture');
+Route::post('/m/api/user/getProfilePicture','ReportsController@mGetProfilePicture');
 Route::post('/m/api/report/getReports','ReportsController@mGetReports');
 Route::post('/m/api/report/getReportsCount','ReportsController@mGetReportsCount');
+// Route::get('/m/sendNotification','ReportsController@mSendNotification');
+Route::post('/m/api/logout','ReportsController@mLogout');
