@@ -12,6 +12,6 @@ class Report extends Model
     }
 
     public function notifications(){
-        return $this->hasMany('\App\Notifications');
+        return $this->hasMany('\App\Notification');
     }
 }
