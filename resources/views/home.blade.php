@@ -20,7 +20,7 @@
 
             <!-- Page Content -->
             <div id="page-content-wrapper">
-                <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+               <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
                     <button class="btn btn-primary btn-menu" id="menu-toggle"><i class="ti-menu"></i></button>
                     <span class="navbar-text hidden navbar-page-name" >
                         <strong>@{{ current_page }}</strong>

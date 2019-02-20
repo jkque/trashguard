@@ -94,12 +94,18 @@ class ReportsController extends Controller
             if($action == "delete"){
                 $report->type = 4;
                 $report->save();
+
+
             } else if ($action == "approve" ){
                 $report->type = 2;
                 $report->save();
+
+                
             } else if ($action == "decline"){
                 $report->type = 3; 
                 $report->save();
+
+
             } else if ($action == "solve"){
                 $report->type = 1; 
                 $report->save();
@@ -107,6 +113,9 @@ class ReportsController extends Controller
                 return ['success' => false];
             }
             $report->updated_by = Auth::user()->id;
+            
+            //
+
             return ['success'=>true,'action'=>$action];
         } 
         return ['success' => false];
@@ -250,11 +259,15 @@ class ReportsController extends Controller
         }
 
         $reports = Report::where("user_id",$request->user_id)->with("images")->get();
-        
+
         foreach($reports as $reportKey => $report) {
             foreach($report->images as $imageKey => $image){
                 if($image){
                     $reports[$reportKey]->images[$imageKey]->image_name = url($image->image_name);
+
+                    $reports[$reportKey]
+                    ->images[$imageKey]
+                    ->image_name = url($image->image_name);
                 }
             }
         }

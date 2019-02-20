@@ -212,7 +212,7 @@
                 let self = this;
                 self.isLoaded = false;
                 self.getReports(null,(response)=>{ 
-                    self.isLoaded = true;                    
+                    self.isLoaded = true;                
                 });
             },
             selectReport(report){
@@ -276,7 +276,6 @@
         height: calc(100vh - 56px);
         padding: 25px;
     }
-
     .report-container {
         background-color: rgba(0,0,0,0.02);
         .report-search {
