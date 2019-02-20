@@ -24,6 +24,10 @@ class VerifyCsrfToken extends Middleware
         '/m/api/report/send',
         '/m/api/user/upload',
         '/m/api/report/getReports',
-        '/m/api/report/getReportsCount'
+        '/m/api/report/getReportsCount',
+        '/m/api/user/getProfilePicture',
+        '/m/sendNotification',
+        '/m/api/logout',
+        '/m/api/report/getReportsFromNotification'
     ];
 }

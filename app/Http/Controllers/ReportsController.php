@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Report;
 use App\ReportImage;
+use App\Notification;
 use Validator;
 use Illuminate\Support\Facades\Hash;
 use App\User;
@@ -30,7 +31,7 @@ class ReportsController extends Controller
     }
 
     public function getUsers(Request $request){
-        return User::orderBy('name')->paginate(10);
+        return User::orderBy('name')->where("type","admin")->paginate(10);
     }
 
     public function addReport(Request $request){
@@ -94,31 +95,83 @@ class ReportsController extends Controller
             if($action == "delete"){
                 $report->type = 4;
                 $report->save();
-
-
+                // $this->mSendNotification();
             } else if ($action == "approve" ){
                 $report->type = 2;
                 $report->save();
-
-                
+                // $this->mSendNotification();
             } else if ($action == "decline"){
                 $report->type = 3; 
                 $report->save();
-
-
+                // $this->mSendNotification();
             } else if ($action == "solve"){
                 $report->type = 1; 
                 $report->save();
+                // $this->mSendNotification();
             } else {
                 return ['success' => false];
             }
-            $report->updated_by = Auth::user()->id;
-            
-            //
-
+            $this->mSendNotification($report,$action);
+            $report->updated_by = Auth::user()->id;   
             return ['success'=>true,'action'=>$action];
+            
         } 
         return ['success' => false];
+    }
+
+    public function mSendNotification($report,$action){
+        define( 'API_ACCESS_KEY', 'AAAAj0E56bU:APA91bEpHMHjUgoPcCSVXZpxkBuldgFdwVr1DkfbaG-t5RjoOglwEk3SQVzOolXtLQUSD_whVCX6PIJaF9Ra7xS6EeMXISY07ALEfKIeEeNm58lm2BT5A8un5CbZh6fWUyY-SI29KS8u');
+        
+        // $to = 'cQm_SgTMF7s:APA91bG5hSmbjY1hXD3Ua1MYizn3CURwPNHzVeA9tvcTeKS_yL_xYPh5G66tQVStvqKDM6jWuaK0ehTlJ_mOKR7EsVOulKsEMHNOeHFyopeXA1sp3OuR6YjT-t5yXYA9WLQxKRHUz9tA';
+        $notification               = new Notification;
+        $notification->report_id    = $report->id;
+        $notification->user_id      = $report->user_id;
+        $notification->title        = 'TrashGuard';
+        $notification->message      = $report->desc;
+        $notification->action       = $action."d";
+        $notification->save();
+        
+        $to = User::find($report->user_id);
+        $data = array(
+            "report_id"=> $report->id,
+            "user_id" => $report->user_id
+        );
+        // str_limit($notifications[$notificationKey]->message,mb_strlen($notifications[$notificationKey]->message)/1.5);
+        // $length = mb_strlen($report->desc/1.5);
+        $msg = array(
+            //  'body' => ".$body." has been ".$action."d",
+            'body' => "Your report ".str_limit($report->desc,5)." has been ".$action."d",
+            'title' => 'TrashGuard'
+        );
+
+		#prep the bundle
+		$fields = array(
+	    				'to'		=> $to->token,
+						'notification'	=> $msg,
+						'data' => $data
+					);
+			
+		$headers = array(
+						'Authorization: key=' . API_ACCESS_KEY,
+						'Content-Type: application/json'
+					);
+		#Send Reponse To FireBase Server	
+		$ch = curl_init();
+		curl_setopt( $ch,CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send' );
+		curl_setopt( $ch,CURLOPT_POST, true );
+		curl_setopt( $ch,CURLOPT_HTTPHEADER, $headers );
+		curl_setopt( $ch,CURLOPT_RETURNTRANSFER, true );
+		curl_setopt( $ch,CURLOPT_SSL_VERIFYPEER, false );
+		curl_setopt( $ch,CURLOPT_POSTFIELDS, json_encode( $fields ) );
+		$result = curl_exec($ch );
+		
+		curl_close( $ch );
+
+        // return json_encode ($result,true,JSON_PRETTY_PRINT);
+        return [
+            "report_id"=> $report->id,
+            "user_id" => $report->user_id
+        ];
     }
 
 
@@ -159,6 +212,31 @@ class ReportsController extends Controller
         ];
     }
 
+    public function mLogout(Request $request){
+        $validator = Validator::make($request->all(),[
+            'user_id' => 'required',
+        ]);
+
+        if($validator->fails()){
+            return ['error' => true,'message'=>'Required fields are missing','stack_trace' => $validator->errors()];
+        }
+
+        $user = User::where("id",$request->user_id)->first();
+        $user->token = null;
+        $user->save();
+
+        return [
+            'error' => false,
+            'message' => 'Sucessfully logged out',
+            'id'    => $user->id,
+            'email' => $user->email,
+            'fname' => $user->first_name,
+            'lname' => $user->last_name,
+            'token' => $user->token,    
+        ];
+        
+    }
+
     public function mLogin(Request $request){
         $validator = Validator::make($request->all(), [
             'user_email'  => 'required',
@@ -180,7 +258,7 @@ class ReportsController extends Controller
                     'email' => $user->email,
                     'fname' => $user->first_name,
                     'lname' => $user->last_name,
-                    'token' => $user->token,
+                    'token' => $user->token,    
                 ];
             }
         }
@@ -259,7 +337,7 @@ class ReportsController extends Controller
         }
 
         $reports = Report::where("user_id",$request->user_id)->with("images")->get();
-
+                   
         foreach($reports as $reportKey => $report) {
             foreach($report->images as $imageKey => $image){
                 if($image){
@@ -271,17 +349,6 @@ class ReportsController extends Controller
                 }
             }
         }
-
-        // $temp = array();
-
-        // foreach($reports as $key => $value){
-        //     $temp = array();
-        //     $reports[$key]['images'] = array();
-        //     $reportImage = ReportImage::where("report_id", $reports[$key]['id'])->get()->toArray();
-
-        //     // array_push($temp,$reportImage);    
-        //     array_push($reports[$key]['images'],$reportImage); 
-        // }
         
         return $reports;    
     }
@@ -306,8 +373,11 @@ class ReportsController extends Controller
             ->where("type",2)
             ->count();
         $declinedCount = Report::where("user_id",$request->user_id)
-            ->where("type",03)
+            ->where("type",3)
             ->count();
+        $archivedCount = Report::where("user_id",$request->user_id)
+            ->where("type",4)
+            ->count();        
         
         return [
             'error'   => false,
@@ -317,6 +387,50 @@ class ReportsController extends Controller
             'solved'  => $solvedCount,
             'ongoing' => $ongoingCount,
             'declined'=> $declinedCount,
+            'archived'=> $archivedCount,
         ];    
     }
+
+    public function mGetProfilePicture(Request $request){
+        $validator = Validator::make($request->all(),[
+            'user_id'  => 'required',
+        ]);
+
+        if($validator->fails()){
+            return ['error' => true,'message'=>'Required fields are missing','stack_trace' => $validator->errors()];
+        }
+
+        $profilePicture = User::find($request->user_id);
+        $profilePicture->profile_photo = url($profilePicture->profile_photo);
+        return $profilePicture;
+    }
+
+    public function mGetReportFromNotification(Request $request){
+        $validator = Validator::make($request->all(),[
+            'user_id'  => 'required',
+        ]);
+
+        if($validator->fails()){
+            return ['error' => true,'message'=>'Required fields are missing','stack_trace' => $validator->errors()];
+        }
+
+        // $notificationReports = Notification::where("user_id",$request->user_id)->get();
+        
+                   
+        $notifications = Notification::where("user_id",$request->user_id)->get();
+        foreach($notifications as $notificationKey => $notification){
+            foreach($notifications[$notificationKey]->report as $reportKey => $report){
+                foreach($notifications[$notificationKey]->report->images as $imageKey => $image){
+                    if($image){
+                        $notifications[$notificationKey]->report->images[$imageKey]->image_name = url($image->image_name);
+                    }
+                    $notifications[$notificationKey]->message = str_limit($notifications[$notificationKey]->message,mb_strlen($notifications[$notificationKey]->message)/1.5);
+                    
+                    }
+                }
+            }
+    
+        return $notifications;
+    }
+    
 }
