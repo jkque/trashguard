@@ -29,6 +29,7 @@ window.toastr = require('toastr');
 import Reports from './components/Reports.vue';
 import Dashboard from './components/Dashboard.vue';
 import AddReport from './components/AddReport.vue';
+import * as VueGoogleMaps from "vue2-google-maps";
 import VueRouter from 'vue-router';
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -42,6 +43,12 @@ const router = new VueRouter({
         { path: '/p/:type', component: Reports, props: true },
         { path: '/addReport', component: AddReport, props: true },
     ]
+});
+Vue.use(VueGoogleMaps, {
+    load: {
+        key: "AIzaSyA5KuuviOmrYNTycGxYgwLyAp-T_MDpDOQ",
+        libraries: "places" // necessary for places input
+    }
 });
 
 Vue.filter('standard_date',(value) => {

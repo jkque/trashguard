@@ -30,6 +30,7 @@
         "sweetalert": "^2.1.2",
         "toastr": "^2.1.4",
         "vue-bootstrap-datetimepicker": "^5.0.1",
-        "vue-router": "^3.0.2"
+        "vue-router": "^3.0.2",
+        "vue2-google-maps": "^0.10.6"
     }
 }

@@ -101,6 +101,27 @@ class ReportsController extends Controller
         $newReport->user_id     = 0;
         $newReport->witnessed_at = date('Y-m-d H:i:s',strtotime($request->witnessed_at));        
         $newReport->type        = 0;
+
+        if($request->longitude){
+            $newReport->longitude = $request->longitude;
+        }
+        if($request->latitude){
+            $newReport->latitude = $request->latitude;
+        }
+        if($request->city){
+            $newReport->city = $request->city;
+        }
+        if($request->province){
+            $newReport->province = $request->province;
+        }
+        if($request->region){
+            $newReport->region = $request->region;
+        }
+        if($request->country){
+            $newReport->country = $request->country;
+        }
+
+
         $newReport->save();
         if($request->images){
             if($request->hasFile('images')) {
@@ -167,6 +188,11 @@ class ReportsController extends Controller
             
         } 
         return ['success' => false];
+    }
+
+    public function getAllReports(Request $request){
+        $reports = Report::whereRaw('location LIKE "%'. $request->place .'%" ')->whereRaw('YEAR(created_at)='.date('Y'))->get();
+        return ['success'=>true,'reports'=>$reports];
     }
 
     public function mSendNotification($report,$action){

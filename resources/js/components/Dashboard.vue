@@ -50,6 +50,13 @@
                             <canvas id="monthly-reports"></canvas>
                         </div>
                     </div>
+                    <div class="card" style="margin-top: 20px;">
+                        <div class="card-body">
+                            <gmap-map :center="center" :zoom="12" style="width:100%;  height: 400px;" v-bind:options="mapStyle">
+                                <gmap-marker  :key="index" v-for="(m, index) in markers"  :position="m.position" @click="center=m.position" ></gmap-marker>
+                            </gmap-map>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-4">
                     <div class="card">
@@ -92,16 +99,22 @@
     export default {
         data(){
             return {
-                categories: [],
-                monthly_reports: [],
-                chart: null,
-                year_reports: 0,
-                location_ranking: [],
-                all: 0,
+                categories:         [],
+                monthly_reports:    [],
+                chart:              null,
+                year_reports:       0,
+                location_ranking:   [],
+                all:                0,
+                center: { lat: 10.3157, lng: 123.8854 },
+                markers: [],
+                places: [],
+                currentPlace: null,
+                mapStyle: {zoom: 15,styles: [{"featureType":"administrative.country","elementType":"labels.text.fill","stylers":[{"color":"#ff0000"}]},{"featureType":"administrative.province","elementType":"labels.text.fill","stylers":[{"color":"#ff0000"}]},{"featureType":"administrative.locality","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"administrative.neighborhood","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"administrative.land_parcel","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"landscape.man_made","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.attraction","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.attraction","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"poi.business","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.business","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"poi.government","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.government","elementType":"labels.icon","stylers":[{"color":"#ff0000"}]},{"featureType":"poi.medical","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.medical","elementType":"labels.icon","stylers":[{"color":"#ff0000"}]},{"featureType":"poi.park","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.park","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"poi.place_of_worship","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.school","elementType":"labels.text.fill","stylers":[{"color":"#080808"}]},{"featureType":"poi.sports_complex","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"road","elementType":"geometry.fill","stylers":[{"color":"#ffcf15"}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"road","elementType":"labels.text.stroke","stylers":[{"color":"#ffffff"}]},{"featureType":"road","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"road.local","elementType":"geometry.fill","stylers":[{"color":"#ffe891"}]},{"featureType":"transit.line","elementType":"labels.text.fill","stylers":[{"color":"#ff0000"}]},{"featureType":"transit.line","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"transit.station","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"transit.station.airport","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"transit.station.bus","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"transit.station.rail","elementType":"labels.text.fill","stylers":[{"color":"#ff0000"}]},{"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#2d2d2d"}]}]}
             }
         },
         mounted(){
             let self = this;
+            this.geolocate();
             Chart.defaults.global.legend.display = false;
             this.chart = new Chart($("#monthly-reports"), {
                 type: 'roundedBar',
@@ -141,6 +154,8 @@
                     
                 }
             });
+            
+            this.getMarkers();
         },
         created(){
             this.chartInitialization();
@@ -151,10 +166,10 @@
                 this.bindMonthlyReportChart();
             });
             this.getLocationRanking((response) => {
-
             });
         },
         methods: {
+            
             bindMonthlyReportChart(){
                 let self = this;
                 $(self.monthly_reports).each((index,category) => {
@@ -216,6 +231,34 @@
                     if(callable){ callable(response); }
                 }).catch((errors)=>{
 
+                });
+            },
+
+            getMarkers(){
+                let self = this;
+                axios.get('/d/getReportByPlace').then((response)=>{
+                    if(response.status  == 200){
+                        $(response.data.reports).each((index,report) => {
+                            if(report.longitude && report.latitude){
+                                self.markers.push({
+                                    lat: report.latitude,
+                                    lng: report.longitude
+                                });
+                            }
+                        });
+                    }
+                    if(callable){ callable(response); }
+                }).catch((errors)=>{
+
+                });
+            },
+
+            geolocate: function() {
+                navigator.geolocation.getCurrentPosition(position => {
+                    this.center = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
                 });
             },
 

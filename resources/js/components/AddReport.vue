@@ -8,9 +8,19 @@
                     <div class="card">
                         <div class="card-body">
                             <form @submit="addReport($event)" id="addReportForm">
+                                <input type="hidden" name="longitude" :value="longitude">
+                                <input type="hidden" name="latitude" :value="latitude">
+                                <input type="hidden" name="city" :value="city">
+                                <input type="hidden" name="province" :value="province">
+                                <input type="hidden" name="region" :value="region">
+                                <input type="hidden" name="country" :value="country">
                                 <div class="form-group">
                                     <label >Location</label>
-                                    <input type="text" name="location" placeholder="Enter a place.." class="form-control" >
+                                    <!-- <input type="text" name="location" placeholder="Enter a place.." class="form-control" > -->
+                                    <gmap-autocomplete
+                                        name="location"
+                                        @place_changed="setPlace" class="form-control">
+                                    </gmap-autocomplete>
                                     <div class="invalid-feedback">
                                         Please enter location
                                     </div>
@@ -71,12 +81,41 @@
                     useCurrent: false,
                 },
                 files_selected: 0,
+                currentPlace: "",
+                longitude:  null,
+                latitude:   null,
+                address:    null,
+                city:       null,
+                province:   null,
+                region:     null,
+                country:    null,
             }
         },
         created(){
             this.getUsers();
         },
         methods: {
+            setPlace(place) {
+                let self = this;
+                this.currentPlace = place;
+                this.longitude = this.currentPlace.geometry.location.lng();
+                this.latitude = this.currentPlace.geometry.location.lat();
+                this.address = this.currentPlace.formatted_address;
+                let startIndex = this.currentPlace.address_components.length - 1;
+                $(this.currentPlace.address_components).each((outIndex,place) => {
+                    $(place.types).each((inIndex,type)=>{
+                        if(type == 'locality'){
+                            self.city = place.long_name;
+                        } else if( type == 'administrative_area_level_2'){
+                            self.province = place.long_name;
+                        } else if( type == 'administrative_area_level_1'){
+                            self.region = place.long_name;
+                        } else if( type == 'country'){
+                            self.country = place.long_name;
+                        }
+                    });
+                });
+            },
             addReport(event){
                 let self = this;
                 event.preventDefault();
