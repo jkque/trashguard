@@ -32,7 +32,7 @@
                                         Please enter image
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group d-none">
                                     <label for="user">Reporter</label>
                                     <select name="user_id" class="form-control" id="user">
                                         <option :value="user.id" v-for="(user,index) in users" :key="index">

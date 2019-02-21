@@ -6,11 +6,13 @@
  */
 
 require('./bootstrap');
+require('chart.js');
 
 window.Vue = require('vue');
 window.swal = require('sweetalert');
 window.moment = require('moment');
 window.toastr = require('toastr');
+
 
 /**
  * The following block of code may be used to automatically register your
@@ -25,6 +27,7 @@ window.toastr = require('toastr');
 
 // Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 import Reports from './components/Reports.vue';
+import Dashboard from './components/Dashboard.vue';
 import AddReport from './components/AddReport.vue';
 import VueRouter from 'vue-router';
 /**
@@ -35,7 +38,7 @@ import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 const router = new VueRouter({
     routes: [
-        { path: '/', component: Reports, props: true },
+        { path: '/', component: Dashboard, props: true },
         { path: '/p/:type', component: Reports, props: true },
         { path: '/addReport', component: AddReport, props: true },
     ]
@@ -69,6 +72,11 @@ const app = new Vue({
         };
         $(".tg-menu .list-group-item[href='"+self.$route.path+"']").addClass("active");
         self.current_page = $(".tg-menu .list-group-item[href='"+self.$route.path+"']").attr("data-name");
+        if(self.current_page == 'Dashboard'){
+            $("#nav-add-report").addClass("d-none");
+        } else {
+            $("#nav-add-report").removeClass("d-none");
+        }
         $(".tg-menu .list-group-item").on("click",(event) => {
             event.preventDefault();
             let url =  $(event.target).attr("href");
@@ -76,6 +84,11 @@ const app = new Vue({
             $(".tg-menu .list-group-item").removeClass("active");
             $(event.target).addClass("active");
             self.current_page = name;
+            if(self.current_page == 'Dashboard'){
+                $("#nav-add-report").addClass("d-none");
+            } else {
+                $("#nav-add-report").removeClass("d-none");
+            }
             router.push({ path: url });
         })
     }

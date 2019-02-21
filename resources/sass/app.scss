@@ -183,7 +183,7 @@ body {
 // Bootstrap 4 breakpoints
 $grid-breakpoints: (
     xs: 0,
-    sm: 576px,
+    sm: 576px, 
     md: 768px,
     lg: 992px,
     xl: 1200px
@@ -200,7 +200,7 @@ $cards-per-line: (
 
 .card-deck {
   display: grid;
- }
+}
 
 @each $name, $breakpoint in $grid-breakpoints {
 	@media (min-width: $breakpoint) {

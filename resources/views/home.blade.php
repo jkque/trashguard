@@ -9,7 +9,8 @@
                     <img src="{{ asset('/images/trashguard.png') }}" class="img-responsive" alt="">
                 </div>
                 <div class="list-group list-group-flush tg-menu">
-                    <a href="/" data-name="Reports" class="list-group-item list-group-item-action bg-light"><i class="ti-folder"></i>&nbsp; Reports</a>
+                    <a href="/" data-name="Dashboard" class="list-group-item list-group-item-action bg-light"><i class="ti-home"></i>&nbsp; Dashboard</a>
+                    <a href="/p/reports" data-name="Reports" class="list-group-item list-group-item-action bg-light"><i class="ti-folder"></i>&nbsp; Reports</a>
                     <a href="/p/ongoing" data-name="On-going" class="list-group-item list-group-item-action bg-light"><i class="ti-reload"></i>&nbsp; ON-GOING</a>
                     <a href="/p/solved" data-name="Solved" class="list-group-item list-group-item-action bg-light"><i class="ti-check"></i>&nbsp; Solved</a>
                     <a href="/p/declined" data-name="Declined" class="list-group-item list-group-item-action bg-light"><i class="ti-close"></i>&nbsp; Declined</a>
@@ -33,7 +34,7 @@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
                             
-                            <li class="nav-item">
+                            <li id="nav-add-report" class="nav-item">
                                 <button type="button" @click="$router.push('/addReport')" class="btn btn-outline-primary navbar-btn"><i class="ti-plus"></i>&nbsp; Add Report</button>
                             </li>
                             <li class="nav-item dropdown">

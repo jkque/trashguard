@@ -27,6 +27,12 @@ Route::get('/getReports/{type?}','ReportsController@getReports')->name('report.g
 Route::post('/addReport','ReportsController@addReport')->name('report.add');
 Route::post('/report/{action}','ReportsController@actionReport')->name('report.action');
 Route::get('/getUsers','ReportsController@getUsers')->name('user.get');
+Route::get('/d/category_count','ReportsController@getCategoryCount')->name('report.category_count');
+Route::get('/d/monthly_reports','ReportsController@getMonthlyReports')->name('user.monthly_reports');
+Route::get('/d/location_ranking','ReportsController@getLocationRanking')->name('user.location_ranking');
+
+
+
 
 // API for mobile
 Route::post('/m/api/register','ReportsController@mRegister');

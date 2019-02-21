@@ -8,6 +8,8 @@ use App\ReportImage;
 use App\Notification;
 use Validator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+
 use App\User;
 use Auth;
 
@@ -34,11 +36,59 @@ class ReportsController extends Controller
         return User::orderBy('name')->where("type","admin")->paginate(10);
     }
 
+    public function getLocationRanking(){
+        $year = date('Y');
+        $locationRanking = Report::select(DB::raw('CONCAT(city,", ",province) as place, count(id) as count'))->whereRaw('YEAR(created_at)='.$year)->groupBy('place')->orderBy('count','DESC')->limit(10)->get();
+        $sumReports = Report::whereRaw('YEAR(created_at)='.$year)->count();
+        return ['success' => true,'message' => 'Successfully retrieved location ranking','ranking' => $locationRanking, 'all'=>$sumReports];
+    }
+
+    public function getMonthlyReports(){
+        $year = date('Y');
+        $monthlyReports = Report::select(DB::raw('MONTH(created_at) as month, count(id) as count'))->whereRaw('YEAR(created_at)='.$year)->groupBy(DB::raw('MONTH(created_at)'))->get();
+        $reportsThisYear = Report::select(DB::raw('count(id) as count'))->whereRaw('YEAR(created_at)='.$year)->first();
+        $months = collect();
+        for ($i = 12; $i > 0; $i--) {
+            $timestamp = mktime(0, 0, 0, date('n') - ($i+1), 1);
+            $data = [
+                "month" => date('M', $timestamp),
+                "count" => 0,
+            ];
+            foreach($monthlyReports as $monthKey => $month){
+                //convert month number to words eg. 2 - February
+                if($month->month == date('n', $timestamp)){
+                    $data["count"] = $month->count;
+                    // break;
+                    // $monthlyReports[$monthKey]->month = date('F', mktime(0, 0, 0, $month->month, 10));
+                }
+            }
+            $months->push($data);
+        }
+        
+        return ['success'=>true,'message'=>'Successfully retrieved monthly reports','data'=>$months,'year_reports'=>$reportsThisYear->count];    
+    }
+
+    public function getCategoryCount(){
+        $categoryCounts = Report::select(DB::raw('type, count(reports.id) as count'))->where("type","<>","4")->groupBy("type")->get();
+        foreach($categoryCounts as $catKey => $category){
+            if($category->type == 0){
+                $categoryCounts[$catKey]->type_name = 'Pending';
+            } elseif ($category->type == 1){
+                $categoryCounts[$catKey]->type_name = 'Solved';
+            } elseif ($category->type == 2){
+                $categoryCounts[$catKey]->type_name = 'On-going';
+            } elseif ($category->type == 3){
+                $categoryCounts[$catKey]->type_name = 'Declined';
+            }
+        }
+        return ['success'=>true,'message'=>'Successfully retrieved category counts','data'=>$categoryCounts];
+    }
+
     public function addReport(Request $request){
         $validator = Validator::make($request->all(), [
             'location'  => 'required',
             'desc'      => 'required',
-            'user_id'      => 'required',
+            // 'user_id'      => 'required',
             'witnessed_at'  => 'required',
         ]);
         if ($validator->fails()) {
@@ -48,7 +98,7 @@ class ReportsController extends Controller
         $newReport              = new Report;
         $newReport->location    = $request->location;
         $newReport->desc        = $request->desc;
-        $newReport->user_id     = $request->user_id;
+        $newReport->user_id     = 0;
         $newReport->witnessed_at = date('Y-m-d H:i:s',strtotime($request->witnessed_at));        
         $newReport->type        = 0;
         $newReport->save();
@@ -234,8 +284,8 @@ class ReportsController extends Controller
             'lname' => $user->last_name,
             'token' => $user->token,    
         ];
-        
     }
+
 
     public function mLogin(Request $request){
         $validator = Validator::make($request->all(), [
