@@ -340,6 +340,8 @@
 <style lang="scss" scoped>
     .d-container {
         padding: 25px;
+        height: calc(100vh - 56px);
+        overflow: auto;
     }
     .card-category {
         .card-subtitle {

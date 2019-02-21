@@ -57,7 +57,12 @@ const app = new Vue({
     data(){
         return {
             current_page: "Reports",
+            categories: [],
+            category_count: [],
         }
+    },
+    created(){
+        this.getCategoryCounts();
     },
     mounted(){
         let self = this;
@@ -91,5 +96,24 @@ const app = new Vue({
             }
             router.push({ path: url });
         })
+    },
+    methods: {
+        getCategoryCounts(callable = null){
+            let self = this;
+            axios.get('/d/category_count').then((response)=>{
+                self.categories = response.data.data;
+                self.getCategoryCountByName();
+                if(callable){ callable(response); }
+            }).catch((errors)=>{
+
+            });
+        },
+
+        getCategoryCountByName(name){
+            let self = this;
+            $(this.categories).each((index,value) => {
+                self.$set(self.category_count,value.type_name,value.count);
+            })
+        }
     }
 });

@@ -9,11 +9,21 @@
                     <img src="{{ asset('/images/trashguard.png') }}" class="img-responsive" alt="">
                 </div>
                 <div class="list-group list-group-flush tg-menu">
-                    <a href="/" data-name="Dashboard" class="list-group-item list-group-item-action bg-light"><i class="ti-home"></i>&nbsp; Dashboard</a>
-                    <a href="/p/reports" data-name="Reports" class="list-group-item list-group-item-action bg-light"><i class="ti-folder"></i>&nbsp; Reports</a>
-                    <a href="/p/ongoing" data-name="On-going" class="list-group-item list-group-item-action bg-light"><i class="ti-reload"></i>&nbsp; ON-GOING</a>
-                    <a href="/p/solved" data-name="Solved" class="list-group-item list-group-item-action bg-light"><i class="ti-check"></i>&nbsp; Solved</a>
-                    <a href="/p/declined" data-name="Declined" class="list-group-item list-group-item-action bg-light"><i class="ti-close"></i>&nbsp; Declined</a>
+                    <a href="/" data-name="Dashboard" class="list-group-item list-group-item-action bg-light">
+                        <i class="ti-home"></i>&nbsp; Dashboard 
+                    </a>
+                    <a href="/p/reports" data-name="Reports" class="list-group-item list-group-item-action bg-light"><i class="ti-folder"></i>
+                        &nbsp; Reports <span style="float: right">@{{ category_count['Pending'] }}</span>
+                    </a>
+                    <a href="/p/ongoing" data-name="On-going" class="list-group-item list-group-item-action bg-light"><i class="ti-reload"></i>
+                        &nbsp; ON-GOING <span style="float: right">@{{ category_count['On-going'] }}</span> 
+                    </a>
+                    <a href="/p/solved" data-name="Solved" class="list-group-item list-group-item-action bg-light"><i class="ti-check"></i>
+                        &nbsp; Solved <span style="float: right">@{{ category_count['Solved'] }} </span>
+                    </a>
+                    <a href="/p/declined" data-name="Declined" class="list-group-item list-group-item-action bg-light"><i class="ti-close"></i>
+                        &nbsp; Declined <span style="float: right">@{{ category_count['Declined'] }}</span>
+                    </a>
                     <a href="/p/archive" data-name="Archive" class="list-group-item list-group-item-action bg-light"><i class="ti-trash"></i>&nbsp; Archive</a>
                 </div>
             </div>
