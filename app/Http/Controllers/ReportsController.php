@@ -34,11 +34,13 @@ class ReportsController extends Controller
 
     public function getUsers(Request $request){
         return User::orderBy('name')->where("type","admin")->paginate(10);
+        // return $report->user_id = Auth::user()->id;
     }
 
     public function getLocationRanking(){
         $year = date('Y');
-        $locationRanking = Report::select(DB::raw('CONCAT(city,", ",province) as place, count(id) as count'))->whereRaw('YEAR(created_at)='.$year)->groupBy('place')->orderBy('count','DESC')->limit(10)->get();
+        $locationRanking = Report::
+            select(DB::raw('CONCAT(city,", ",province) as place, count(id) as count'))->whereRaw('YEAR(created_at)='.$year)->groupBy('place')->orderBy('count','DESC')->limit(10)->get();
         $sumReports = Report::whereRaw('YEAR(created_at)='.$year)->count();
         return ['success' => true,'message' => 'Successfully retrieved location ranking','ranking' => $locationRanking, 'all'=>$sumReports];
     }
@@ -88,7 +90,7 @@ class ReportsController extends Controller
         $validator = Validator::make($request->all(), [
             'location'  => 'required',
             'desc'      => 'required',
-            // 'user_id'      => 'required',
+            'user_id'      => 'required',
             'witnessed_at'  => 'required',
         ]);
         if ($validator->fails()) {
@@ -98,7 +100,7 @@ class ReportsController extends Controller
         $newReport              = new Report;
         $newReport->location    = $request->location;
         $newReport->desc        = $request->desc;
-        $newReport->user_id     = 0;
+        $newReport->user_id     = Auth::user()->id;
         $newReport->witnessed_at = date('Y-m-d H:i:s',strtotime($request->witnessed_at));        
         $newReport->type        = 0;
 
@@ -362,6 +364,25 @@ class ReportsController extends Controller
         $newReport->location = $request->report_location;
         $newReport->witnessed_at = date('Y-m-d H:i:s',strtotime($request->report_date." ".$request->report_time));
         $newReport->type = 0;
+        if($request->longitude){
+            $newReport->longitude = $request->longitude;
+        }
+        if($request->latitude){
+            $newReport->latitude = $request->latitude;
+        }
+        if($request->city){
+            $newReport->city = $request->city;
+        }
+        if($request->province){
+            $newReport->province = $request->province;
+        }
+        if($request->region){
+            $newReport->region = $request->region;
+        }
+        if($request->country){
+            $newReport->country = $request->country;
+        }
+
         $newReport->save();
         
         foreach($request->image as $key => $value){

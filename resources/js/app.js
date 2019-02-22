@@ -46,7 +46,7 @@ const router = new VueRouter({
 });
 Vue.use(VueGoogleMaps, {
     load: {
-        key: "AIzaSyA5KuuviOmrYNTycGxYgwLyAp-T_MDpDOQ",
+        key: "AIzaSyBCHGtvSe3AdfT73nAWg_3NLrMBOsnhD6g",
         libraries: "places" // necessary for places input
     }
 });
