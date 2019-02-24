@@ -71,7 +71,7 @@
                             </div>
                             <p style="color: #7f8c8d; font-size: 12px;" v-if="responseText">{{ responseText }}</p>
                             <gmap-map :center="center" :zoom="12" style="width:100%;  height: 400px; margin-bottom: 3px;" v-bind:options="mapStyle">
-                                <gmap-marker  :key="index" v-for="(m, index) in markers"  :position="m.position" @click="center=m.position" ></gmap-marker>
+                                <gmap-marker  :key="index" v-for="(m, index) in markers"  :position="m.position"></gmap-marker>
                                 <GmapCircle
                                     :center="center"
                                     :radius="mapRadius"
@@ -315,12 +315,6 @@
                                 self.markers.push(new google.maps.Marker({
                                     icon: {
                                         url: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png',
-                                        // This marker is 20 pixels wide by 32 pixels high.
-                                        size: new google.maps.Size(20, 32),
-                                        // The origin for this image is (0, 0).
-                                        origin: new google.maps.Point(0, 0),
-                                        // The anchor for this image is the base of the flagpole at (0, 32).
-                                        anchor: new google.maps.Point(0, 32)
                                     } ,
                                     position: {
                                         lat: parseFloat(report.latitude),
@@ -343,15 +337,15 @@
                 //         lng: position.coords.longitude
                 //     };
                 // });
-                 if ("geolocation" in navigator){ //check geolocation available 
-                    //try to get user current location using getCurrentPosition() method
-                    navigator.geolocation.getCurrentPosition(function(position){ 
-                        self.currentLocation = position;
-                        console.log(self.currentLocation);
-                    });
-                }else{
-                    console.log("Browser doesn't support geolocation!");
-                }
+                //  if ("geolocation" in navigator){ //check geolocation available 
+                //     //try to get user current location using getCurrentPosition() method
+                //     navigator.geolocation.getCurrentPosition(function(position){ 
+                //         self.currentLocation = position;
+                //         console.log(self.currentLocation);
+                //     });
+                // }else{
+                //     console.log("Browser doesn't support geolocation!");
+                // }
             },
 
             chartInitialization(){

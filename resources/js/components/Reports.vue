@@ -105,6 +105,11 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="report-description" v-show="selected_report.latitude && selected_report.longitude">
+                                <gmap-map :center="center" :zoom="12" style="width:100%;  height: 400px; margin-bottom:100px;" v-bind:options="mapStyle">
+                                    <gmap-marker  :key="index" v-for="(m, index) in markers"  :position="m.position"></gmap-marker>
+                                </gmap-map>
+                            </div> 
                         </div>
                     </div>
                 </div>
@@ -175,11 +180,19 @@
                 my_type:           0,
                 empty:          false,
                 image_path:     null,
+                center: { lat: 10.3157, lng: 123.8854 },
+                markers: [],
+                mapStyle: {scrollwheel: false, navigationControl: false, mapTypeControl: false, scaleControl: false, draggable: false,zoom: 13,styles: [{"featureType":"administrative.country","elementType":"labels.text.fill","stylers":[{"color":"#ff0000"}]},{"featureType":"administrative.province","elementType":"labels.text.fill","stylers":[{"color":"#ff0000"}]},{"featureType":"administrative.locality","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"administrative.neighborhood","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"administrative.land_parcel","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"landscape.man_made","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.attraction","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.attraction","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"poi.business","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.business","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"poi.government","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.government","elementType":"labels.icon","stylers":[{"color":"#ff0000"}]},{"featureType":"poi.medical","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.medical","elementType":"labels.icon","stylers":[{"color":"#ff0000"}]},{"featureType":"poi.park","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.park","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"poi.place_of_worship","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.school","elementType":"labels.text.fill","stylers":[{"color":"#080808"}]},{"featureType":"poi.sports_complex","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"road","elementType":"geometry.fill","stylers":[{"color":"#ffcf15"}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"road","elementType":"labels.text.stroke","stylers":[{"color":"#ffffff"}]},{"featureType":"road","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"road.local","elementType":"geometry.fill","stylers":[{"color":"#ffe891"}]},{"featureType":"transit.line","elementType":"labels.text.fill","stylers":[{"color":"#ff0000"}]},{"featureType":"transit.line","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"transit.station","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"transit.station.airport","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"transit.station.bus","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"transit.station.rail","elementType":"labels.text.fill","stylers":[{"color":"#ff0000"}]},{"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#2d2d2d"}]}]}
+
             }
         },
         mounted(){
             let self = this;
-            setTimeout(() => { self.isLoaded = true; },100);
+            setTimeout(() => { 
+                self.isLoaded = true; 
+                
+            },100);
+
         },
         created(){
             let self = this;
@@ -188,6 +201,17 @@
                 self.my_type = self.interpretType(this.type); 
             }
             this.getReports(null,(response)=>{
+                if(self.selected_report){
+                    if(self.selected_report.longitude && self.selected_report.latitude){
+                        self.center = { lat: parseFloat(self.selected_report.latitude), lng: parseFloat(self.selected_report.longitude) };
+                        self.markers.push(new google.maps.Marker({
+                            position: {
+                                lat: parseFloat(self.selected_report.latitude),
+                                lng: parseFloat(self.selected_report.longitude)
+                            },
+                        }));
+                    }
+                }
             });
         },
         methods: {
@@ -217,6 +241,17 @@
             },
             selectReport(report){
                 this.selected_report = report;
+                this.markers = [];
+                if(report.latitude && report.longitude){
+                    this.center = { lat: parseFloat(report.latitude), lng: parseFloat(report.longitude) };
+                    this.markers.push(new google.maps.Marker({
+                        position: {
+                            lat: parseFloat(report.latitude),
+                            lng: parseFloat(report.longitude)
+                        },
+                    }));
+                }
+                $(".report-view-details").scrollTop = 0;
             },
             showImage(path){
                 this.image_path = path;
