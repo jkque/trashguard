@@ -52,9 +52,34 @@
                     </div>
                     <div class="card" style="margin-top: 20px;">
                         <div class="card-body">
-                            <gmap-map :center="center" :zoom="12" style="width:100%;  height: 400px;" v-bind:options="mapStyle">
+                            <div class="input-group">
+                                <gmap-autocomplete
+                                    class="form-control"
+                                    style="margin-bottom: 4px"
+                                    placeholder="Search reports at.."
+                                    @place_changed="setPlace">
+                                </gmap-autocomplete>
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ selectedOptionType }} <span class="caret"></span></button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#" @click="selectMapReportType($event,0)">Pending</a>
+                                        <a class="dropdown-item" href="#" @click="selectMapReportType($event,2)">On-going</a>
+                                        <a class="dropdown-item" href="#" @click="selectMapReportType($event,1)">Solved</a>
+                                        <a class="dropdown-item" href="#" @click="selectMapReportType($event,3)">Declined</a>
+                                    </div>
+                                </div><!-- /btn-group -->
+                            </div>
+                            <p style="color: #7f8c8d; font-size: 12px;" v-if="responseText">{{ responseText }}</p>
+                            <gmap-map :center="center" :zoom="12" style="width:100%;  height: 400px; margin-bottom: 3px;" v-bind:options="mapStyle">
                                 <gmap-marker  :key="index" v-for="(m, index) in markers"  :position="m.position" @click="center=m.position" ></gmap-marker>
+                                <GmapCircle
+                                    :center="center"
+                                    :radius="mapRadius"
+                                    :visible="true"
+                                    :options="circleOtions"
+                                ></GmapCircle>
                             </gmap-map>
+                            <p style="margin: 0;"><small>All reports shown are under 2 km radius based on a specified location.</small></p>
                         </div>
                     </div>
                 </div>
@@ -99,6 +124,7 @@
     export default {
         data(){
             return {
+                type_name: ['Pending', 'Solved', 'On-going', 'Declined'],
                 categories:         [],
                 monthly_reports:    [],
                 chart:              null,
@@ -109,7 +135,19 @@
                 markers: [],
                 places: [],
                 currentPlace: null,
-                mapStyle: {zoom: 15,styles: [{"featureType":"administrative.country","elementType":"labels.text.fill","stylers":[{"color":"#ff0000"}]},{"featureType":"administrative.province","elementType":"labels.text.fill","stylers":[{"color":"#ff0000"}]},{"featureType":"administrative.locality","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"administrative.neighborhood","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"administrative.land_parcel","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"landscape.man_made","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.attraction","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.attraction","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"poi.business","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.business","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"poi.government","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.government","elementType":"labels.icon","stylers":[{"color":"#ff0000"}]},{"featureType":"poi.medical","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.medical","elementType":"labels.icon","stylers":[{"color":"#ff0000"}]},{"featureType":"poi.park","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.park","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"poi.place_of_worship","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.school","elementType":"labels.text.fill","stylers":[{"color":"#080808"}]},{"featureType":"poi.sports_complex","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"road","elementType":"geometry.fill","stylers":[{"color":"#ffcf15"}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"road","elementType":"labels.text.stroke","stylers":[{"color":"#ffffff"}]},{"featureType":"road","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"road.local","elementType":"geometry.fill","stylers":[{"color":"#ffe891"}]},{"featureType":"transit.line","elementType":"labels.text.fill","stylers":[{"color":"#ff0000"}]},{"featureType":"transit.line","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"transit.station","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"transit.station.airport","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"transit.station.bus","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"transit.station.rail","elementType":"labels.text.fill","stylers":[{"color":"#ff0000"}]},{"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#2d2d2d"}]}]}
+                icons:          [],
+                circleOtions: {
+                    strokeColor: '#9b7b00',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor:'#000',
+                    fillOpacity:0.1
+                },
+                currentLocation: 'Cebu City, Cebu',
+                selectedOptionType: 'Report Type',
+                responseText: '',
+                mapRadius: 2000,
+                mapStyle: {zoom: 13,styles: [{"featureType":"administrative.country","elementType":"labels.text.fill","stylers":[{"color":"#ff0000"}]},{"featureType":"administrative.province","elementType":"labels.text.fill","stylers":[{"color":"#ff0000"}]},{"featureType":"administrative.locality","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"administrative.neighborhood","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"administrative.land_parcel","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"landscape.man_made","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.attraction","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.attraction","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"poi.business","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.business","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"poi.government","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.government","elementType":"labels.icon","stylers":[{"color":"#ff0000"}]},{"featureType":"poi.medical","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.medical","elementType":"labels.icon","stylers":[{"color":"#ff0000"}]},{"featureType":"poi.park","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.park","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"poi.place_of_worship","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"poi.school","elementType":"labels.text.fill","stylers":[{"color":"#080808"}]},{"featureType":"poi.sports_complex","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"road","elementType":"geometry.fill","stylers":[{"color":"#ffcf15"}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"road","elementType":"labels.text.stroke","stylers":[{"color":"#ffffff"}]},{"featureType":"road","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"road.local","elementType":"geometry.fill","stylers":[{"color":"#ffe891"}]},{"featureType":"transit.line","elementType":"labels.text.fill","stylers":[{"color":"#ff0000"}]},{"featureType":"transit.line","elementType":"labels.icon","stylers":[{"color":"#000000"}]},{"featureType":"transit.station","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"transit.station.airport","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"transit.station.bus","elementType":"labels.text.fill","stylers":[{"color":"#000000"}]},{"featureType":"transit.station.rail","elementType":"labels.text.fill","stylers":[{"color":"#ff0000"}]},{"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#2d2d2d"}]}]}
             }
         },
         mounted(){
@@ -155,9 +193,20 @@
                 }
             });
             
-            this.getMarkers();
+            setTimeout(() => {
+                this.getMarkers();
+            },1000); 
+
+           
         },
         created(){
+            
+            this.icons = [
+                this.$parent.root_url + '/images/g-icon-pending.png?raw=true',
+                this.$parent.root_url + '/images/g-icon-solved.png?raw=true',
+                this.$parent.root_url + '/images/g-icon-on-going.png?raw=true',
+                this.$parent.root_url + '/images/g-icon-declined.png?raw=true',
+            ];
             this.chartInitialization();
             this.getCategoryCounts((response) => {
                 this.bindIcons();
@@ -169,7 +218,25 @@
             });
         },
         methods: {
-            
+            setPlace(place){
+                let self = this;
+                self.currentLocation = place.formatted_address;
+                self.$set(self.center,'lat',parseFloat(place.geometry.location.lat()));
+                self.$set(self.center,'lng',parseFloat(place.geometry.location.lng()));
+                this.currentPlace = place;
+                self.getMarkers();
+            },
+
+            selectMapReportType(event,type){
+                event.preventDefault();
+                
+                let self = this;
+                self.selectedOptionType = self.type_name[type];
+                self.getMarkers(type,()=>{
+
+                });
+            },
+
             bindMonthlyReportChart(){
                 let self = this;
                 $(self.monthly_reports).each((index,category) => {
@@ -208,6 +275,7 @@
                     self.categories = response.data.data;
                     if(callable){ callable(response); }
                 }).catch((errors)=>{
+                    console.log(errors);
 
                 });
             },
@@ -219,6 +287,7 @@
                     self.year_reports = response.data.year_reports;
                     if(callable){ callable(response); }
                 }).catch((errors)=>{
+                    console.log(errors);
 
                 });
             },
@@ -230,36 +299,59 @@
                     self.all = response.data.all;
                     if(callable){ callable(response); }
                 }).catch((errors)=>{
-
+                    console.log(errors);
                 });
             },
 
-            getMarkers(){
+            getMarkers(type = 0, callable = null ){
                 let self = this;
-                axios.get('/d/getReportByPlace').then((response)=>{
+                axios.get('/d/getReportByPlace',{params:{ type: type, lng: self.center.lng, lat: self.center.lat }}).then((response)=>{
                     if(response.status  == 200){
+                        self.markers = [];
+
+                        self.responseText = "Showing "+response.data.reports.length+' '+self.type_name[type]+' Reports in '+self.currentLocation;
                         $(response.data.reports).each((index,report) => {
                             if(report.longitude && report.latitude){
-                                self.markers.push({
-                                    lat: report.latitude,
-                                    lng: report.longitude
-                                });
+                                self.markers.push(new google.maps.Marker({
+                                    icon: {
+                                        url: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png',
+                                        // This marker is 20 pixels wide by 32 pixels high.
+                                        size: new google.maps.Size(20, 32),
+                                        // The origin for this image is (0, 0).
+                                        origin: new google.maps.Point(0, 0),
+                                        // The anchor for this image is the base of the flagpole at (0, 32).
+                                        anchor: new google.maps.Point(0, 32)
+                                    } ,
+                                    position: {
+                                        lat: parseFloat(report.latitude),
+                                        lng: parseFloat(report.longitude)
+                                    },
+                                }));
                             }
                         });
                     }
                     if(callable){ callable(response); }
                 }).catch((errors)=>{
-
+                    console.log(errors);
                 });
             },
 
             geolocate: function() {
-                navigator.geolocation.getCurrentPosition(position => {
-                    this.center = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
-                });
+                // navigator.geolocation.getCurrentPosition(position => {
+                //     this.center = {
+                //         lat: position.coords.latitude,
+                //         lng: position.coords.longitude
+                //     };
+                // });
+                 if ("geolocation" in navigator){ //check geolocation available 
+                    //try to get user current location using getCurrentPosition() method
+                    navigator.geolocation.getCurrentPosition(function(position){ 
+                        self.currentLocation = position;
+                        console.log(self.currentLocation);
+                    });
+                }else{
+                    console.log("Browser doesn't support geolocation!");
+                }
             },
 
             chartInitialization(){

@@ -193,8 +193,19 @@ class ReportsController extends Controller
     }
 
     public function getAllReports(Request $request){
-        $reports = Report::whereRaw('location LIKE "%'. $request->place .'%" ')->whereRaw('YEAR(created_at)='.date('Y'))->get();
-        return ['success'=>true,'reports'=>$reports];
+        $lat = $request->lat;
+        $lng = $request->lng;
+        $distance  = 2;
+        $reports = Report::selectRaw('*, ( 6367 * acos( cos( radians( ? ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( latitude ) ) ) ) AS distance', [$lat, $lng, $lat]);
+        $reports->where('type',$request->type);
+        if(isset($request->place)){ 
+            $reports->whereRaw('location LIKE "%'. $request->place .'%" ');
+        }
+        
+        $reports->whereRaw('YEAR(created_at)='.date('Y'))
+        ->having('distance', '<',$distance)
+        ->orderBy('distance');
+        return ['success'=>true,'reports'=>$reports->get()];
     }
 
     public function mSendNotification($report,$action){

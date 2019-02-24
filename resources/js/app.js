@@ -66,6 +66,7 @@ const app = new Vue({
             current_page: "Reports",
             categories: [],
             category_count: [],
+            root_url: __root_url,
         }
     },
     created(){
